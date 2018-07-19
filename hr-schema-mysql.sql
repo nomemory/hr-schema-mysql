@@ -25,9 +25,9 @@ CREATE TABLE countries (
 	country_id CHAR(2) NOT NULL,
 	country_name VARCHAR(40),
 	region_id INT (11) UNSIGNED NOT NULL,
-	PRIMARY KEY (country_id),
-	CONSTRAINT countries_regions_region_id FOREIGN KEY (region_id) REFERENCES regions(region_id)
-	);
+	PRIMARY KEY (country_id)
+);
+
 
 CREATE TABLE locations (
 	location_id INT (11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -36,8 +36,7 @@ CREATE TABLE locations (
 	city VARCHAR(30) NOT NULL,
 	state_province VARCHAR(25),
 	country_id CHAR(2) NOT NULL,
-	PRIMARY KEY (location_id),
-	CONSTRAINT locations_countries_country_id FOREIGN KEY (country_id) REFERENCES countries(country_id)
+	PRIMARY KEY (location_id)
 	);
 
 CREATE TABLE departments (
@@ -45,8 +44,7 @@ CREATE TABLE departments (
 	department_name VARCHAR(30) NOT NULL,
 	manager_id INT (11) UNSIGNED,
 	location_id INT (11) UNSIGNED,
-	PRIMARY KEY (department_id),
-	CONSTRAINT departments_locations_location_id FOREIGN KEY (location_id) REFERENCES locations(location_id)
+	PRIMARY KEY (department_id)
 	);
 
 CREATE TABLE jobs (
@@ -69,29 +67,22 @@ CREATE TABLE employees (
 	commission_pct DECIMAL(2, 2),
 	manager_id INT (11) UNSIGNED,
 	department_id INT (11) UNSIGNED,
-	PRIMARY KEY (employee_id),
-	CONSTRAINT employees_jobs_job_id FOREIGN KEY (job_id) REFERENCES jobs(job_id),
-	CONSTRAINT employees_departments_department_id FOREIGN KEY (department_id) REFERENCES departments(department_id),
-	CONSTRAINT employees_employees_employee_id FOREIGN KEY (manager_id) REFERENCES employees(employee_id)
+	PRIMARY KEY (employee_id)
 	);
-
-ALTER TABLE departments ADD FOREIGN KEY (manager_id) REFERENCES employees (employee_id);
 
 CREATE TABLE job_history (
 	employee_id INT (11) UNSIGNED NOT NULL,
 	start_date DATE NOT NULL,
 	end_date DATE NOT NULL,
 	job_id VARCHAR(10) NOT NULL,
-	department_id INT (11) UNSIGNED NOT NULL,
-	CONSTRAINT job_history_employees_employee_id FOREIGN KEY (employee_id) REFERENCES employees(employee_id),
-	CONSTRAINT job_history_jobs_job_id FOREIGN KEY (job_id) REFERENCES jobs(job_id),
-	CONSTRAINT job_history_departments_department_id FOREIGN KEY (department_id) REFERENCES departments(department_id)
+	department_id INT (11) UNSIGNED NOT NULL
 	);
 
 ALTER TABLE job_history ADD UNIQUE INDEX (
 	employee_id,
 	start_date
 	);
+
 
 CREATE VIEW emp_details_view
 AS
@@ -2635,3 +2626,18 @@ VALUES (
 	);
     
 COMMIT;
+
+/* *************************************************************** 
+***************************FOREIGN KEYS***************************
+**************************************************************** */
+
+ALTER TABLE countries ADD FOREIGN KEY (region_id) REFERENCES regions(region_id);    
+ALTER TABLE locations ADD FOREIGN KEY (country_id) REFERENCES countries(country_id);
+ALTER TABLE departments ADD FOREIGN KEY (location_id) REFERENCES locations(location_id);
+ALTER TABLE employees ADD FOREIGN KEY (job_id) REFERENCES jobs(job_id);
+ALTER TABLE employees ADD FOREIGN KEY (department_id) REFERENCES departments(department_id);
+ALTER TABLE employees ADD FOREIGN KEY (manager_id) REFERENCES employees(employee_id);
+ALTER TABLE departments ADD FOREIGN KEY (manager_id) REFERENCES employees (employee_id);
+ALTER TABLE job_history ADD FOREIGN KEY (employee_id) REFERENCES employees(employee_id);
+ALTER TABLE job_history ADD FOREIGN KEY (job_id) REFERENCES jobs(job_id);
+ALTER TABLE job_history ADD FOREIGN KEY (department_id) REFERENCES departments(department_id);
